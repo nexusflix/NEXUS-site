@@ -1,688 +1,1273 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Ativação - NEXUSFLIX</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS FLIX PLAYER — Assista em qualquer tela</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0908;
+    --bg-soft: #131110;
+    --panel: #17140f;
+    --panel-line: #2a241a;
+    --ember: #ff5a1f;
+    --ember-2: #ffb347;
+    --ember-dim: #6b3a1c;
+    --text: #f4efe4;
+    --muted: #948a7a;
+    --dormant: #3a352c;
+    --dormant-text: #6e685c;
+    --ok: #4ee08a;
+    --radius: 16px;
+  }
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{ scroll-behavior:smooth; }
 
-        body {
-            background: #0a0a0a;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+  body{
+    font-family:'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height:100vh;
+    overflow-x:hidden;
+    background-image:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(255,90,31,.16), transparent 60%),
+      repeating-linear-gradient(115deg, rgba(255,255,255,.015) 0px, rgba(255,255,255,.015) 1px, transparent 1px, transparent 64px);
+  }
 
-        .card {
-            width: 100%;
-            max-width: 480px;
-            background: #1a1a1a;
-            border: 1px solid #333;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 30px rgba(0,0,0,.6);
-        }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: .001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  }
 
-        .card h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #e67e22;
-            font-size: 24px;
-        }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 20px 22px;
+    max-width: 1100px; margin:0 auto;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand-mark{
+    width:34px; height:34px; border-radius:9px;
+    background: linear-gradient(145deg, var(--ember), var(--ember-2));
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Bebas Neue', sans-serif; font-size:18px; color:#160c05;
+    box-shadow: 0 0 24px rgba(255,90,31,.45);
+  }
+  .brand-name{ font-family:'Bebas Neue', sans-serif; font-size:20px; letter-spacing:1px; }
+  .brand-name span{ color: var(--ember-2); }
 
-        .tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
+  .hero{
+    max-width: 720px; margin: 0 auto;
+    padding: 54px 24px 40px;
+    text-align:center;
+    position:relative;
+  }
 
-        .tab-btn {
-            flex: 1;
-            padding: 10px 5px;
-            background: #252525;
-            border: 1px solid #444;
-            color: #ccc;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
+  .signal{
+    position:relative; width:96px; height:96px; margin:0 auto 26px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .signal-ring{
+    position:absolute; inset:0; border-radius:50%;
+    border:1px solid rgba(255,124,60,.35);
+    animation: pulse-ring 2.6s cubic-bezier(.2,.6,.3,1) infinite;
+  }
+  .signal-ring.r2{ animation-delay: .9s; }
+  .signal-ring.r3{ animation-delay: 1.8s; }
+  @keyframes pulse-ring{
+    0%{ transform:scale(.55); opacity:.9; }
+    100%{ transform:scale(1.9); opacity:0; }
+  }
+  .signal-core{
+    width:64px; height:64px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, var(--ember-2), var(--ember) 60%, #7a2c0a 100%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 0 40px rgba(255,90,31,.55), inset 0 0 14px rgba(0,0,0,.25);
+  }
+  .signal-core svg{ width:26px; height:26px; }
 
-        .tab-btn.active {
-            background: #d35400;
-            color: #fff;
-            border-color: #d35400;
-        }
+  .eyebrow{
+    font-size:12px; letter-spacing:3px; color:var(--ember-2);
+    text-transform:uppercase; font-weight:600; margin-bottom:14px;
+  }
 
-        .tab-content {
-            display: none;
-        }
+  h1.title{
+    font-family:'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 10vw, 64px);
+    letter-spacing: 1px;
+    line-height: .95;
+    background: linear-gradient(180deg, #fff, #e7ded0 55%, var(--ember-2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
 
-        .tab-content.active {
-            display: block;
-        }
+  .welcome{
+    margin-top:16px; color: var(--muted); font-size:15.5px; line-height:1.6;
+    max-width: 480px; margin-left:auto; margin-right:auto;
+  }
+  .welcome strong{ color: var(--text); font-weight:600; }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+  .hero-actions{
+    margin-top:26px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+  }
+  .btn{
+    border:none; border-radius:11px; padding:13px 22px; font-size:14.5px; font-weight:700;
+    cursor:pointer; font-family:inherit; transition:.2s;
+  }
+  .btn-primary{
+    background: linear-gradient(140deg, var(--ember), var(--ember-2));
+    color:#1a0d03;
+    box-shadow: 0 8px 24px rgba(255,90,31,.3);
+  }
+  .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 12px 28px rgba(255,90,31,.4); }
+  .btn-ghost{
+    background: transparent; color: var(--text); border:1px solid var(--panel-line);
+  }
+  .btn-ghost:hover{ border-color: var(--ember); color: var(--ember-2); }
 
-        .form-group label {
-            display: block;
-            color: #ccc;
-            font-size: 14px;
-            margin-bottom: 6px;
-        }
+  .devices{
+    max-width: 1000px; margin: 10px auto 0; padding: 30px 20px 70px;
+  }
+  .devices-head{ text-align:center; margin-bottom:26px; }
+  .devices-head h2{
+    font-family:'Bebas Neue', sans-serif; font-size:26px; letter-spacing:.5px;
+  }
+  .devices-head p{ color:var(--muted); font-size:13.5px; margin-top:6px; }
 
-        .form-group input {
-            width: 100%;
-            height: 45px;
-            padding: 0 12px;
-            background: #252525;
-            color: #fff;
-            border: 1px solid #444;
-            border-radius: 8px;
-            font-size: 15px;
-            outline: none;
-            transition: .3s;
-        }
+  .device-grid{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap:12px;
+  }
 
-        .form-group input:focus {
-            border-color: #d35400;
-            background: #2d2d2d;
-        }
+  .device-card{
+    background: var(--panel);
+    border:1px solid var(--panel-line);
+    border-radius: var(--radius);
+    padding: 18px 12px 14px;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    text-align:center;
+    cursor:pointer;
+    transition:.2s;
+    position:relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .device-card:active{ transform: scale(.97); }
 
-        .btn-submit {
-            width: 100%;
-            height: 48px;
-            background: #d35400;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: .3s;
-            margin-top: 10px;
-        }
+  .device-card.is-live{ border-color: rgba(255,124,60,.4); }
+  .device-card.is-live:hover{ border-color: var(--ember); background:#1c1810; transform: translateY(-3px); }
 
-        .btn-submit:hover {
-            background: #e67e22;
-        }
+  .device-card.is-soon{ opacity:.68; cursor:default; }
 
-        .btn-submit:disabled {
-            background: #555;
-            cursor: not-allowed;
-        }
+  .device-icon{
+    width:44px; height:44px; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    background: var(--dormant);
+    font-family:'Bebas Neue', sans-serif; font-size:14px; color: var(--dormant-text);
+  }
+  .is-live .device-icon{
+    background: linear-gradient(145deg, var(--ember), var(--ember-2));
+    color:#1a0d03;
+  }
 
-        .list-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 15px;
-        }
+  .device-name{ font-size:13px; font-weight:700; letter-spacing:.3px; }
+  .is-soon .device-name{ color: var(--dormant-text); }
 
-        .list-item {
-            background: #252525;
-            border: 1px solid #444;
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+  .device-status{
+    font-size:10px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;
+    display:flex; align-items:center; gap:5px;
+  }
+  .is-live .device-status{ color: var(--ok); }
+  .is-soon .device-status{ color: var(--dormant-text); }
 
-        .list-item-info h4 {
-            color: #e67e22;
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
+  .dot{ width:6px; height:6px; border-radius:50%; background:currentColor; }
+  .is-live .dot{ animation: blink 1.6s ease-in-out infinite; }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.35;} }
 
-        .list-item-info p {
-            color: #aaa;
-            font-size: 12px;
-            word-break: break-all;
-        }
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform: translate(-50%, 20px);
+    background: var(--panel); border:1px solid var(--panel-line);
+    color: var(--text); padding:12px 18px; border-radius:10px; font-size:13.5px;
+    opacity:0; pointer-events:none; transition:.25s; max-width: 90vw; text-align:center;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5);
+  }
+  .toast.show{ opacity:1; transform: translate(-50%, 0); }
 
-        .list-actions {
-            display: flex;
-            gap: 8px;
-        }
+  footer{
+    text-align:center; padding: 22px; color: var(--dormant-text); font-size:12px;
+  }
 
-        .btn-action {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 12px;
-            cursor: pointer;
-        }
+  .menu-btn{
+    width:42px; height:42px; border-radius:11px;
+    background: var(--panel); border:1px solid var(--panel-line); color: var(--text);
+    font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; transition:.2s;
+  }
+  .menu-btn:hover{ border-color: var(--ember); color: var(--ember-2); }
 
-        .btn-edit { background: #2980b9; color: #fff; }
-        .btn-delete { background: #c0392b; color: #fff; }
+  .drawer-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.6);
+    opacity:0; pointer-events:none; transition:.25s; z-index:90;
+  }
+  .drawer-overlay.open{ opacity:1; pointer-events:auto; }
 
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            z-index: 100;
-        }
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:300px; max-width:84vw;
+    background: var(--panel); border-left:1px solid var(--panel-line);
+    transform: translateX(100%); transition:.3s cubic-bezier(.2,.8,.2,1);
+    z-index:95; display:flex; flex-direction:column; padding:22px 18px;
+  }
+  .drawer.open{ transform: translateX(0); }
 
-        .modal-content {
-            background: #1a1a1a;
-            border: 1px solid #444;
-            border-radius: 12px;
-            padding: 20px;
-            width: 100%;
-            max-width: 420px;
-        }
+  .drawer-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:26px; }
+  .drawer-brand{ display:flex; align-items:center; gap:9px; }
+  .drawer-brand .brand-mark{ width:30px; height:30px; font-size:15px; }
+  .drawer-brand .brand-name{ font-size:15.5px; }
+  .drawer-close{ background:none; border:none; color: var(--muted); font-size:22px; cursor:pointer; line-height:1; }
+  .drawer-close:hover{ color: var(--text); }
 
-        #statusMessage {
-            margin-top: 18px;
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-size: 14px;
-            display: none;
-        }
+  .drawer-menu{ display:flex; flex-direction:column; gap:3px; }
+  .drawer-menu button{
+    background:none; border:none; text-align:left; color: var(--muted);
+    font-size:15px; font-weight:700; letter-spacing:.2px;
+    padding:14px 8px; border-radius:9px; cursor:pointer; transition:.2s;
+  }
+  .drawer-menu button:hover{ background: var(--bg-soft); color: var(--text); }
+  .drawer-menu button.active{ background: var(--bg-soft); color: var(--text); }
 
-        .status-success { background: #145a1a; color: #b7f7bb; }
-        .status-error { background: #721c24; color: #ffb3b3; }
-    </style>
+  #appView{ display:none; max-width:720px; margin:0 auto; padding:22px 22px 60px; }
+  .appview-head{ display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+  .back-btn{
+    width:38px; height:38px; border-radius:10px; background: var(--panel);
+    border:1px solid var(--panel-line); color: var(--text); font-size:16px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .back-btn:hover{ border-color: var(--ember); }
+  .appview-title{ font-family:'Bebas Neue', sans-serif; font-size:22px; letter-spacing:.4px; }
+
+  .app-panel{ display:none; animation: viewfade .2s ease; }
+  .app-panel.active{ display:block; }
+  @keyframes viewfade{ from{ opacity:0; transform: translateY(6px);} to{ opacity:1; transform:none;} }
+
+  .card{
+    background: var(--panel); border:1px solid var(--panel-line); border-radius: var(--radius); padding:22px;
+  }
+  .card h3{ font-family:'Bebas Neue', sans-serif; font-size:20px; letter-spacing:.4px; margin-bottom:4px; }
+  .card .sub{ color: var(--muted); font-size:12.5px; margin-bottom:18px; }
+
+  .form-group{ margin-bottom:14px; }
+  .form-group label{ display:block; color: var(--muted); font-size:12.5px; margin-bottom:6px; font-weight:600; }
+  .form-group input{
+    width:100%; height:46px; padding:0 13px; background: var(--bg-soft); color: var(--text);
+    border:1px solid var(--panel-line); border-radius:10px; font-size:14.5px; outline:none; transition:.2s;
+  }
+  .form-group input:focus{ border-color: var(--ember); background:#1c1710; }
+
+  .btn-main{
+    width:100%; height:48px; border:none; border-radius:10px; color:#1a0d03; font-size:14.5px; font-weight:700;
+    cursor:pointer; transition:.2s; margin-top:4px;
+    background: linear-gradient(120deg, var(--ember), var(--ember-2));
+  }
+  .btn-main:hover{ filter:brightness(1.08); }
+  .btn-main:disabled{ background:#333; color:#999; cursor:not-allowed; filter:none; }
+
+  .btn-muted{
+    width:100%; height:46px; border-radius:10px; color: var(--muted); font-size:13.5px; font-weight:700;
+    background: transparent; border:1px solid var(--panel-line); cursor:pointer; margin-top:10px;
+  }
+  .btn-muted:hover{ color: var(--text); border-color:#444; }
+
+  .subtabs{ display:flex; gap:18px; margin-bottom:18px; border-bottom:1px solid var(--panel-line); flex-wrap:wrap; }
+  .subtabs button{
+    background:none; border:none; cursor:pointer; color: var(--muted);
+    font-size:12.5px; font-weight:700; letter-spacing:.3px; padding:0 0 11px; position:relative;
+  }
+  .subtabs button.active{ color: var(--text); }
+  .subtabs button.active::after{
+    content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px; background: var(--ember);
+  }
+  .subpanel{ display:none; }
+  .subpanel.active{ display:block; }
+
+  .list-container{ display:flex; flex-direction:column; gap:10px; margin-top:6px; }
+  .list-item{
+    background: var(--bg-soft); border:1px solid var(--panel-line); border-radius:10px; padding:13px;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    flex-wrap:wrap;
+  }
+  .list-item-info h4{ color: var(--ember-2); font-size:14.5px; margin-bottom:3px; }
+  .list-item-info p{ color: var(--muted); font-size:11.5px; word-break:break-all; }
+  .list-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .btn-action{ padding:7px 10px; border:none; border-radius:7px; font-weight:700; font-size:11px; cursor:pointer; }
+  .btn-edit{ background:#3a2c14; color:#ffd699; }
+  .btn-delete{ background:#3a1414; color:#ffb3b3; }
+
+  .modal{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.8);
+    justify-content:center; align-items:center; padding:20px; z-index:100;
+  }
+  .modal.open{ display:flex; }
+  .modal-content{ background: var(--panel); border:1px solid var(--panel-line); border-radius:14px; padding:20px; width:100%; max-width:420px; }
+  .modal-content h3{ color: var(--ember-2); margin-bottom:14px; font-family:'Bebas Neue', sans-serif; font-size:19px; }
+
+  #statusMessage{
+    margin-top:16px; padding:12px; border-radius:10px; text-align:center; font-size:13.5px; display:none;
+  }
+  .status-success{ background:#123320; color:#a7f3c8; }
+  .status-error{ background:#3a1616; color:#ffb3b3; }
+  
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 0.8s ease-in-out infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--dormant);
+    border-radius: 3px;
+    margin-top: 12px;
+    overflow: hidden;
+    display: none;
+  }
+  .progress-bar .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--ember), var(--ember-2));
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.3s;
+  }
+  
+  .test-list-btn {
+    background: var(--bg-soft);
+    border: 1px dashed var(--panel-line);
+    color: var(--muted);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 8px;
+    text-align: center;
+    transition: .2s;
+  }
+  .test-list-btn:hover {
+    border-color: var(--ember);
+    color: var(--text);
+  }
+
+  .debug-info {
+    background: var(--bg-soft);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--muted);
+    display: none;
+    word-break: break-all;
+    max-height: 150px;
+    overflow-y: auto;
+    font-family: monospace;
+  }
+  .debug-info.show { display: block; }
+</style>
 </head>
 <body>
 
-<div class="card">
-    <h2>NEUXS FLIX ATIVAÇÃO criador | xz.daniel.01</h2>
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">N</div>
+      <div class="brand-name">NEXUS FLIX <span>PLAYER</span></div>
+    </div>
+    <button class="menu-btn" onclick="openDrawer()" aria-label="Abrir menu">☰</button>
+  </div>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('m3u')">LISTA M3U</button>
-        <button class="tab-btn" onclick="switchTab('xtreme')">LISTA XTREME</button>
-        <button class="tab-btn" onclick="switchTab('login')"> NEXUS LOGIN</button>
+  <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+  <aside class="drawer" id="drawer">
+    <div class="drawer-head">
+      <div class="drawer-brand">
+        <div class="brand-mark">N</div>
+        <div class="brand-name">NEXUS FLIX <span>PLAYER</span></div>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer()" aria-label="Fechar menu">×</button>
+    </div>
+    <nav class="drawer-menu">
+      <button data-view="ativacao" onclick="openAppView('ativacao')">Ativação</button>
+      <button data-view="carregar" onclick="openAppView('carregar')">Carregar Lista</button>
+      <button data-view="login" onclick="openAppView('login')">Login</button>
+    </nav>
+  </aside>
+
+  <div id="homeView">
+  <section class="hero">
+    <div class="signal">
+      <div class="signal-ring r1"></div>
+      <div class="signal-ring r2"></div>
+      <div class="signal-ring r3"></div>
+      <div class="signal-core">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7-11-7z" fill="#1a0d03"/></svg>
+      </div>
+    </div>
+    <div class="eyebrow">Bem-vindo ao seu novo player</div>
+    <h1 class="title">NEXUS FLIX<br>PLAYER</h1>
+    <p class="welcome">
+      Filmes, séries e canais direto na tela que você já tem em casa.
+      <strong>Sem enrolação, sem loja lotada de anúncio</strong> — só liga o dispositivo e assiste.
+    </p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="document.getElementById('devices').scrollIntoView()">Ver dispositivos</button>
+      <button class="btn btn-ghost" onclick="showToast('Central de ativação em breve por aqui.')">Já tenho o app</button>
+    </div>
+  </section>
+  <section class="devices" id="devices">
+    <div class="devices-head">
+      <h2>Disponível para o seu aparelho</h2>
+      <p>Roku e Android já estão liberados. Os demais entram no ar assim que forem aprovados nas lojas oficiais.</p>
+    </div>
+    <div class="device-grid" id="deviceGrid"></div>
+  </section>
+  </div>
+
+  <div id="appView">
+    <div class="appview-head">
+      <button class="back-btn" onclick="closeAppView()" aria-label="Voltar">←</button>
+      <div class="appview-title" id="appViewTitle">Ativação</div>
     </div>
 
-    <div id="m3uTab" class="tab-content active">
+    <!-- ATIVAÇÃO -->
+    <div class="app-panel" id="app-ativacao">
+      <div class="card">
+        <h3>Ativar aplicativo</h3>
+        <p class="sub">Digite o código e o PIN para ativar seu dispositivo.</p>
         <div class="form-group">
-            <label>Código MAC (7 dígitos):</label>
-            <input type="text" id="m3uMac" placeholder="Ex: 6745578" maxlength="7" style="text-transform: uppercase;">
+          <label>Código</label>
+          <input type="text" id="actCode" placeholder="Ex: 3779F99" maxlength="12" style="text-transform:uppercase;">
         </div>
         <div class="form-group">
-            <label>Código PIN (7 dígitos):</label>
-            <input type="text" id="m3uPin" placeholder="Ex: 6792778" maxlength="7" inputmode="numeric">
+          <label>PIN</label>
+          <input type="text" id="actPin" placeholder="Ex: 3237829" maxlength="12" inputmode="numeric">
         </div>
         <div class="form-group">
-            <label>Título da lista:</label>
-            <input type="text" id="m3uTitle" placeholder="Ex: Minha Lista">
+          <label>Nome (opcional)</label>
+          <input type="text" id="actNome" placeholder="Ex: João Silva">
         </div>
-        <div class="form-group">
-            <label>URL da lista:</label>
-            <input type="url" id="m3uUrl" placeholder="http://...">
-        </div>
-        <button id="btnM3u" class="btn-submit" onclick="processUpload('m3u')">ENVIAR LISTA</button>
+        <button class="btn-main" id="btnAtivar" onclick="liberarAplicativo()">LIBERAR APLICATIVO</button>
+      </div>
     </div>
 
-    <div id="xtremeTab" class="tab-content">
-        <div class="form-group">
-            <label>Código MAC (7 dígitos):</label>
-            <input type="text" id="xtremeMac" placeholder="Ex: 6745578" maxlength="7" style="text-transform: uppercase;">
-        </div>
-        <div class="form-group">
-            <label>Código PIN (7 dígitos):</label>
-            <input type="text" id="xtremePin" placeholder="Ex: 6792778" maxlength="7" inputmode="numeric">
-        </div>
-        <div class="form-group">
-            <label>Título da lista:</label>
-            <input type="text" id="xtremeTitle" placeholder="Ex: Minha Lista Xtreme">
-        </div>
-        <div class="form-group">
-            <label>User:</label>
-            <input type="text" id="xtremeUser" placeholder="9syr7mp2">
-        </div>
-        <div class="form-group">
-            <label>Pass:</label>
-            <input type="text" id="xtremePass" placeholder="3b2mfsrz">
-        </div>
-        <div class="form-group">
-            <label>Host:</label>
-            <input type="text" id="xtremeHost" placeholder="http://ipsmart.icu:80">
-        </div>
-        <button id="btnXtreme" class="btn-submit" onclick="processUpload('xtreme')">ENVIAR LISTA</button>
-    </div>
-
-    <div id="loginTab" class="tab-content">
-        <div id="loginForm">
-            <div class="form-group">
-                <label>Código MAC (7 dígitos):</label>
-                <input type="text" id="loginMac" placeholder="Ex: 6745578" maxlength="7" style="text-transform: uppercase;">
-            </div>
-            <div class="form-group">
-                <label>Código PIN (7 dígitos):</label>
-                <input type="text" id="loginPin" placeholder="Ex: 6792778" maxlength="7" inputmode="numeric">
-            </div>
-            <button id="btnLogin" class="btn-submit" onclick="loginAndFetch()">ENTRAR E GERENCIAR</button>
+    <!-- CARREGAR LISTA -->
+    <div class="app-panel" id="app-carregar">
+      <div class="card">
+        <div class="subtabs" id="subtabs">
+          <button class="active" data-sub="m3u" onclick="switchSubTab('m3u')">LISTA M3U</button>
+          <button data-sub="xtreme" onclick="switchSubTab('xtreme')">LISTA XTREME</button>
+          <button data-sub="login" onclick="switchSubTab('login')">NEXUS LOGIN</button>
         </div>
 
-        <div id="userListsContainer" style="display:none;">
-            <h3 style="color:#e67e22; font-size:16px; margin-top:10px;">Listas Encontradas:</h3>
+        <div id="sub-m3u" class="subpanel active">
+          <div class="form-group"><label>Código MAC (7 dígitos)</label><input type="text" id="m3uMac" placeholder="Ex: 6745578" maxlength="7" style="text-transform:uppercase;"></div>
+          <div class="form-group"><label>Código PIN (7 dígitos)</label><input type="text" id="m3uPin" placeholder="Ex: 6792778" maxlength="7" inputmode="numeric"></div>
+          <div class="form-group"><label>Título da lista</label><input type="text" id="m3uTitle" placeholder="Ex: Minha Lista"></div>
+          <div class="form-group"><label>URL da lista M3U</label><input type="url" id="m3uUrl" placeholder="http://.../playlist.m3u"></div>
+          <button class="test-list-btn" onclick="preencherListaTeste()">📋 Carregar lista de teste</button>
+          <button id="btnM3u" class="btn-main" onclick="processUpload('m3u')" style="margin-top:12px;">📥 BAIXAR E ENVIAR LISTA</button>
+        </div>
+
+        <div id="sub-xtreme" class="subpanel">
+          <div class="form-group"><label>Código MAC (7 dígitos)</label><input type="text" id="xtremeMac" placeholder="Ex: 6745578" maxlength="7" style="text-transform:uppercase;"></div>
+          <div class="form-group"><label>Código PIN (7 dígitos)</label><input type="text" id="xtremePin" placeholder="Ex: 6792778" maxlength="7" inputmode="numeric"></div>
+          <div class="form-group"><label>Título da lista</label><input type="text" id="xtremeTitle" placeholder="Ex: Minha Lista Xtreme"></div>
+          <div class="form-group"><label>User</label><input type="text" id="xtremeUser" placeholder="2113930647"></div>
+          <div class="form-group"><label>Pass</label><input type="text" id="xtremePass" placeholder="0262694865"></div>
+          <div class="form-group"><label>Host</label><input type="text" id="xtremeHost" placeholder="http://xewte.top"></div>
+          <button class="test-list-btn" onclick="preencherXtremeTeste()">📋 Carregar dados de teste</button>
+          <button id="btnXtreme" class="btn-main" onclick="processUpload('xtreme')" style="margin-top:12px;">📥 BAIXAR E ENVIAR LISTA</button>
+        </div>
+
+        <div id="sub-login" class="subpanel">
+          <div id="loginForm">
+            <div class="form-group"><label>Código MAC (7 dígitos)</label><input type="text" id="loginMac" placeholder="Ex: 6745578" maxlength="7" style="text-transform:uppercase;"></div>
+            <div class="form-group"><label>Código PIN (7 dígitos)</label><input type="text" id="loginPin" placeholder="Ex: 6792778" maxlength="7" inputmode="numeric"></div>
+            <button id="btnLogin" class="btn-main" onclick="loginAndFetch()">ENTRAR E GERENCIAR</button>
+          </div>
+          <div id="userListsContainer" style="display:none;">
+            <h3 style="font-size:15px; margin-top:6px; margin-bottom:10px;">Listas encontradas</h3>
             <div id="verticalList" class="list-container"></div>
-            <button class="btn-submit" style="background:#444; margin-top:15px;" onclick="logout()">VOLTAR</button>
+            <button class="btn-muted" onclick="logout()">VOLTAR</button>
+          </div>
         </div>
+
+        <div id="statusMessage"></div>
+        <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="debug-info" id="debugInfo"></div>
+      </div>
     </div>
 
-    <div id="statusMessage"></div>
-</div>
+    <!-- LOGIN -->
+    <div class="app-panel" id="app-login">
+      <div class="card">
+        <h3>Gerenciar minhas listas</h3>
+        <p class="sub">Entre com o MAC e PIN vinculados para editar ou remover suas listas.</p>
+        <div class="form-group"><label>Código MAC (7 dígitos)</label><input type="text" id="loginMac2" placeholder="Ex: 6745578" maxlength="7" style="text-transform:uppercase;"></div>
+        <div class="form-group"><label>Código PIN (7 dígitos)</label><input type="text" id="loginPin2" placeholder="Ex: 6792778" maxlength="7" inputmode="numeric"></div>
+        <button class="btn-main" onclick="goToLoginShortcut()">ENTRAR E GERENCIAR</button>
+      </div>
+    </div>
+  </div>
 
-<div id="editModal" class="modal">
+  <div id="editModal" class="modal">
     <div class="modal-content">
-        <h3 style="color:#e67e22; margin-bottom:15px;">Editar Lista</h3>
-        
-        <div class="form-group">
-            <label>Título da lista:</label>
-            <input type="text" id="editTitle">
-        </div>
-
-        <div id="editTypeM3u" style="display:none;">
-            <div class="form-group">
-                <label>URL M3U:</label>
-                <input type="text" id="editM3uUrl">
-            </div>
-        </div>
-
-        <div id="editTypeXtreme" style="display:none;">
-            <div class="form-group">
-                <label>User:</label>
-                <input type="text" id="editUser">
-            </div>
-            <div class="form-group">
-                <label>Pass:</label>
-                <input type="text" id="editPass">
-            </div>
-            <div class="form-group">
-                <label>Host:</label>
-                <input type="text" id="editHost">
-            </div>
-        </div>
-
-        <button class="btn-submit" onclick="saveEditedList()">SALVAR ALTERAÇÕES</button>
-        <button class="btn-submit" style="background:#555; margin-top:8px;" onclick="closeEditModal()">CANCELAR</button>
+      <h3>Editar lista</h3>
+      <div class="form-group"><label>Título da lista</label><input type="text" id="editTitle"></div>
+      <div id="editTypeM3u" style="display:none;">
+        <div class="form-group"><label>URL M3U</label><input type="text" id="editM3uUrl"></div>
+      </div>
+      <div id="editTypeXtreme" style="display:none;">
+        <div class="form-group"><label>User</label><input type="text" id="editUser"></div>
+        <div class="form-group"><label>Pass</label><input type="text" id="editPass"></div>
+        <div class="form-group"><label>Host</label><input type="text" id="editHost"></div>
+      </div>
+      <button class="btn-main" onclick="saveEditedList()">SALVAR ALTERAÇÕES</button>
+      <button class="btn-muted" onclick="closeEditModal()">CANCELAR</button>
     </div>
-</div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <footer>NEXUS FLIX PLAYER — todos os direitos reservados</footer>
 
 <script>
-const SUPABASE_BASE_URL = "https://ugqowiffckcmfhrhgmbs.supabase.co";
-const SUPABASE_KEY = "sb_publishable_DkZWo2w0XeZcmtxnqo-oGA_r0ro6aAX";
+  /* ============================================================
+     CONFIGURAÇÕES - SUPABASE
+     ============================================================ */
+  const SUPABASE_BASE_URL = "https://ugqowiffckcmfhrhgmbs.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_DkZWo2w0XeZcmtxnqo-oGA_r0ro6aAX";
 
-const GITHUB_REPO = "nexusflix/NEXUSFLIXTV";
-const GITHUB_PATH = "Nexusflix/List/M3u";
+  const TESTE_M3U_URL = "http://xewte.top/get.php?username=2113930647&password=0262694865&type=m3u_plus";
+  const TESTE_XTREME = {
+    host: "http://xewte.top",
+    user: "2113930647",
+    pass: "0262694865"
+  };
 
-let currentFileData = null; 
-let currentEditingKey = null;
+  let currentFileData = null;
+  let currentEditingKey = null;
+  let debugLogs = [];
 
-// Função Utilitária para buscar valores ignorando fontes especiais e caracteres estilizados
-function getValueByFlexibleKeys(obj, possibleKeys) {
-    if (!obj || typeof obj !== 'object') return "";
-    const objKeys = Object.keys(obj);
-    for (const pKey of possibleKeys) {
-        for (const oKey of objKeys) {
-            if (oKey.toLowerCase().replace(/[^a-z0-9]/g, '') === pKey.toLowerCase().replace(/[^a-z0-9]/g, '')) {
-                return obj[oKey];
-            }
-        }
+  const VIEW_TITLES = { ativacao: "Ativação", carregar: "Carregar Lista", login: "Login" };
+
+  function addDebug(msg) {
+    debugLogs.push(msg);
+    const el = document.getElementById('debugInfo');
+    if (el) {
+      el.textContent = debugLogs.join('\n');
+      el.scrollTop = el.scrollHeight;
     }
-    return "";
-}
+    console.log(msg);
+  }
 
-function switchTab(type) {
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  /* ---------- menu ---------- */
+  function openDrawer(){
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+  }
+  function closeDrawer(){
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+  }
+
+  function openAppView(view){
+    closeDrawer();
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('appView').style.display = 'block';
+    document.querySelectorAll('.app-panel').forEach(p => p.classList.toggle('active', p.id === 'app-' + view));
+    document.querySelectorAll('.drawer-menu button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+    document.getElementById('appViewTitle').textContent = VIEW_TITLES[view];
     showStatus("", "none");
+    window.scrollTo(0, 0);
+  }
 
-    if (type === 'm3u') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('m3uTab').classList.add('active');
-    } else if (type === 'xtreme') {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('xtremeTab').classList.add('active');
-    } else {
-        document.querySelectorAll('.tab-btn')[2].classList.add('active');
-        document.getElementById('loginTab').classList.add('active');
-    }
-}
+  function closeAppView(){
+    document.getElementById('appView').style.display = 'none';
+    document.getElementById('homeView').style.display = 'block';
+    document.querySelectorAll('.drawer-menu button').forEach(b => b.classList.remove('active'));
+  }
 
-async function getGithubToken() {
-    const response = await fetch(`${SUPABASE_BASE_URL}/rest/v1/Token?select=*`, {
-        method: "GET",
-        headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": "Bearer " + SUPABASE_KEY,
-            "Content-Type": "application/json"
-        }
-    });
+  function goToLoginShortcut(){
+    document.getElementById('loginMac').value = document.getElementById('loginMac2').value;
+    document.getElementById('loginPin').value = document.getElementById('loginPin2').value;
+    openAppView('carregar');
+    switchSubTab('login');
+    loginAndFetch();
+  }
 
-    if (!response.ok) throw new Error("Falha ao obter credenciais.");
+  function switchSubTab(name){
+    document.querySelectorAll('#subtabs button').forEach(b => b.classList.toggle('active', b.dataset.sub === name));
+    document.querySelectorAll('.subpanel').forEach(p => p.classList.remove('active'));
+    document.getElementById('sub-' + name).classList.add('active');
+    showStatus("", "none");
+  }
 
-    const data = await response.json();
-    if (data && data.length > 0 && data[0].id) {
-        return data[0].id;
-    }
-    throw new Error("Token não encontrado.");
-}
+  function preencherListaTeste() {
+    document.getElementById('m3uUrl').value = TESTE_M3U_URL;
+    document.getElementById('m3uMac').value = "1234567";
+    document.getElementById('m3uPin').value = "1234567";
+    document.getElementById('m3uTitle').value = "Lista Teste XEWTE";
+    showStatus("📋 Dados de teste preenchidos! Clique em 'BAIXAR E ENVIAR LISTA'", "");
+  }
 
-async function getGithubFile(mac, ghToken) {
-    const fileUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_PATH}/${mac}.json`;
-    
-    const response = await fetch(fileUrl, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${ghToken}`,
-            "Accept": "application/vnd.github.v3+json"
-        }
-    });
+  function preencherXtremeTeste() {
+    document.getElementById('xtremeHost').value = TESTE_XTREME.host;
+    document.getElementById('xtremeUser').value = TESTE_XTREME.user;
+    document.getElementById('xtremePass').value = TESTE_XTREME.pass;
+    document.getElementById('xtremeMac').value = "1234567";
+    document.getElementById('xtremePin').value = "1234567";
+    document.getElementById('xtremeTitle').value = "Lista Xtreme Teste";
+    showStatus("📋 Dados de teste preenchidos! Clique em 'BAIXAR E ENVIAR LISTA'", "");
+  }
 
-    if (response.status === 200) {
-        const fileData = await response.json();
-        const contentDecoded = decodeURIComponent(escape(atob(fileData.content)));
-        return {
-            sha: fileData.sha,
-            json: JSON.parse(contentDecoded)
-        };
-    }
-    return null;
-}
+  /* ============================================================
+     ATIVAÇÃO
+     ============================================================ */
+  async function liberarAplicativo(){
+    const code = document.getElementById("actCode").value.trim().toUpperCase();
+    const pin = document.getElementById("actPin").value.trim();
+    const nome = document.getElementById("actNome").value.trim() || "Usuário Ativado via Web";
+    const btn = document.getElementById("btnAtivar");
 
-async function processUpload(type) {
-    let mac, pin, title, itemObject, button;
+    if (!code || !pin){ showStatus("❌ Preencha o código e o PIN.", "error"); return; }
+    if (code.length < 3 || pin.length < 3) { showStatus("❌ Código e PIN devem ter pelo menos 3 caracteres.", "error"); return; }
 
-    if (type === 'm3u') {
-        mac = document.getElementById("m3uMac").value.trim().toUpperCase();
-        pin = document.getElementById("m3uPin").value.trim();
-        title = document.getElementById("m3uTitle").value.trim();
-        const url = document.getElementById("m3uUrl").value.trim();
-        button = document.getElementById("btnM3u");
-
-        itemObject = {
-            "título": title,
-            "ᴍ3ᴜ": url
-        };
-    } else {
-        mac = document.getElementById("xtremeMac").value.trim().toUpperCase();
-        pin = document.getElementById("xtremePin").value.trim();
-        title = document.getElementById("xtremeTitle").value.trim();
-        const user = document.getElementById("xtremeUser").value.trim();
-        const pass = document.getElementById("xtremePass").value.trim();
-        let host = document.getElementById("xtremeHost").value.trim();
-        button = document.getElementById("btnXtreme");
-
-        itemObject = {
-            "título": title,
-            "ᴜꜱᴇʀ": user,
-            "ᴩᴀꜱꜱ": pass,
-            "host": host
-        };
-    }
-
-    if (!/^[A-Z0-9]{7}$/.test(mac)) { showStatus("Digite um MAC válido com 7 dígitos.", "error"); return; }
-    if (!/^[0-9]{7}$/.test(pin)) { showStatus("Digite um PIN com 7 números.", "error"); return; }
-    if (!title) { showStatus("Informe o título da lista.", "error"); return; }
-
-    button.disabled = true;
-    button.innerHTML = "PROCESSANDO...";
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> VERIFICANDO...';
     showStatus("", "none");
 
     try {
-        const ghToken = await getGithubToken();
-        const existingFile = await getGithubFile(mac, ghToken);
+      const searchUrl = `${SUPABASE_BASE_URL}/rest/v1/LiberarApp?code=eq.${encodeURIComponent(code)}&select=id`;
+      const searchRes = await fetch(searchUrl, {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" }
+      });
 
-        let jsonObject = {
-            "Mac": mac,
-            "Pin": pin,
-            "List1": "", "List2": "", "List3": "", "List4": "", "List5": ""
-        };
+      const expireDate = new Date();
+      expireDate.setFullYear(expireDate.getFullYear() + 1);
+      const expireStr = expireDate.toISOString().split('T')[0];
 
-        let sha = null;
-        if (existingFile) {
-            jsonObject = existingFile.json;
-            sha = existingFile.sha;
+      if (searchRes.ok) {
+        const existingRows = await searchRes.json();
+        if (existingRows && existingRows.length > 0) {
+          const updateUrl = `${SUPABASE_BASE_URL}/rest/v1/LiberarApp?id=eq.${existingRows[0].id}`;
+          const updateRes = await fetch(updateUrl, {
+            method: "PATCH",
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": "Bearer " + SUPABASE_KEY,
+              "Content-Type": "application/json",
+              "Prefer": "return=minimal"
+            },
+            body: JSON.stringify({ pin, nome, released: true, expire: expireStr })
+          });
+          if (!updateRes.ok) throw new Error("Erro ao atualizar");
+          showStatus(`✅ Atualizado! Código: ${code} | Válido até: ${expireStr}`, "success");
+          return;
         }
+      }
 
-        let slotEncontrado = false;
-        for (let i = 1; i <= 5; i++) {
-            const key = `List${i}`;
-            if (!jsonObject[key] || jsonObject[key] === "") {
-                jsonObject[key] = itemObject;
-                slotEncontrado = true;
-                break;
-            }
-        }
+      const insertRes = await fetch(`${SUPABASE_BASE_URL}/rest/v1/LiberarApp`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ code, pin, nome, released: true, expire: expireStr })
+      });
+      if (!insertRes.ok) throw new Error("Erro ao criar registro");
+      showStatus(`✅ Liberado! Código: ${code} | Válido até: ${expireStr}`, "success");
 
-        if (!slotEncontrado) throw new Error("Limite máximo de 5 listas atingido para este MAC.");
-
-        await updateGithubFile(mac, jsonObject, sha, ghToken);
-        showStatus("Lista vinculada com sucesso!", "success");
-
-    } catch (error) {
-        showStatus("Erro: " + error.message, "error");
+    } catch (err) {
+      showStatus(`❌ Erro: ${err.message}`, "error");
     } finally {
-        button.disabled = false;
-        button.innerHTML = "ENVIAR LISTA";
+      btn.disabled = false;
+      btn.innerHTML = "LIBERAR APLICATIVO";
     }
-}
+  }
 
-async function loginAndFetch() {
+  /* ============================================================
+     DOWNLOAD M3U COM PROXY
+     ============================================================ */
+  async function downloadM3U(url) {
+    addDebug(`📥 Tentando baixar: ${url}`);
+    
+    // Primeiro tenta direto (funcionou no seu teste!)
+    try {
+      addDebug(`🔄 Tentando download direto...`);
+      const response = await fetch(url, { 
+        signal: AbortSignal.timeout(30000),
+        mode: 'cors'
+      });
+      if (response.ok) {
+        const text = await response.text();
+        if (text && (text.includes('#EXTM3U') || text.includes('#EXTINF'))) {
+          addDebug(`✅ M3U baixado com sucesso direto! (${text.length} caracteres)`);
+          return text;
+        }
+      }
+    } catch (e) {
+      addDebug(`⚠️ Download direto falhou: ${e.message}`);
+    }
+
+    // Tenta com proxies
+    const proxyUrls = [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      `https://corsproxy.io/?${encodeURIComponent(url)}`
+    ];
+
+    for (const proxyUrl of proxyUrls) {
+      try {
+        addDebug(`🔄 Tentando proxy: ${proxyUrl}`);
+        const response = await fetch(proxyUrl, {
+          signal: AbortSignal.timeout(30000)
+        });
+        if (response.ok) {
+          const text = await response.text();
+          if (text && (text.includes('#EXTM3U') || text.includes('#EXTINF'))) {
+            addDebug(`✅ M3U baixado via proxy! (${text.length} caracteres)`);
+            return text;
+          }
+        }
+      } catch (e) {
+        addDebug(`⚠️ Proxy falhou: ${e.message}`);
+      }
+    }
+
+    throw new Error("Não foi possível baixar a lista M3U.");
+  }
+
+  /* ============================================================
+     XTREME
+     ============================================================ */
+  async function downloadXtreme(host, user, pass) {
+    const liveUrl = `${host}/get.php?username=${user}&password=${pass}&type=m3u_plus&output=ts`;
+    const m3uContent = await downloadM3U(liveUrl);
+    
+    let seriesData = {};
+    try {
+      const seriesUrl = `${host}/player_api.php?username=${user}&password=${pass}`;
+      addDebug(`🔄 Tentando baixar séries: ${seriesUrl}`);
+      const response = await fetch(seriesUrl, { signal: AbortSignal.timeout(15000) });
+      if (response.ok) {
+        seriesData = await response.json();
+        addDebug(`✅ Séries baixadas: ${Object.keys(seriesData).join(', ')}`);
+      }
+    } catch (e) {
+      addDebug(`⚠️ Séries: ${e.message}`);
+    }
+    
+    return { m3u: m3uContent, series: seriesData };
+  }
+
+  /* ============================================================
+     PARSER M3U
+     ============================================================ */
+  function parseM3UToJSON(m3uContent, title, mac, pin, seriesData = null) {
+    addDebug(`🔄 Parseando M3U... (${m3uContent.length} caracteres)`);
+    
+    const lines = m3uContent.split('\n');
+    const channels = [];
+    let currentChannel = {};
+    let orderIndex = 1;
+
+    function extractAttr(line, attr) {
+      const match = line.match(new RegExp(`${attr}="([^"]*)"`));
+      return match ? match[1] : '';
+    }
+
+    let totalLines = 0;
+    let processedChannels = 0;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      totalLines++;
+      
+      if (line.startsWith('#EXTINF:')) {
+        const tvgId = extractAttr(line, 'tvg-id') || '';
+        const tvgName = extractAttr(line, 'tvg-name') || '';
+        const tvgLogo = extractAttr(line, 'tvg-logo') || '';
+        const groupTitle = extractAttr(line, 'group-title') || 'Geral';
+        
+        const nameMatch = line.match(/,([^,]*)$/);
+        const name = nameMatch ? nameMatch[1].trim() : `Canal ${orderIndex}`;
+        
+        currentChannel = {
+          id: orderIndex,
+          name: name,
+          tvg_id: tvgId,
+          tvg_name: tvgName || name,
+          logo: tvgLogo,
+          group_title: groupTitle,
+          language: 'pt',
+          country: 'BR',
+          active: true,
+          order_index: orderIndex
+        };
+      } else if (line && line.startsWith('http') && currentChannel.name) {
+        currentChannel.stream_url = line;
+        channels.push(currentChannel);
+        processedChannels++;
+        orderIndex++;
+        currentChannel = {};
+      }
+    }
+
+    addDebug(`📊 Processados: ${processedChannels} canais de ${totalLines} linhas`);
+
+    // Organiza por categorias
+    const liveChannels = channels.filter(c => {
+      const g = (c.group_title || '').toLowerCase();
+      return !g.includes('filme') && !g.includes('série') && !g.includes('serie') && !g.includes('movie') && !g.includes('series');
+    });
+    
+    const movieChannels = channels.filter(c => {
+      const g = (c.group_title || '').toLowerCase();
+      return g.includes('filme') || g.includes('cinema') || g.includes('movie');
+    });
+    
+    const seriesChannels = channels.filter(c => {
+      const g = (c.group_title || '').toLowerCase();
+      return g.includes('série') || g.includes('serie') || g.includes('series');
+    });
+
+    const feed = {
+      version: 1,
+      updated_at: new Date().toISOString(),
+      live: liveChannels.map((c, idx) => ({
+        id: c.id || idx + 1,
+        name: c.name || `Canal ${idx + 1}`,
+        stream_url: c.stream_url || '',
+        logo: c.logo || '',
+        group_title: c.group_title || 'TV Ao Vivo',
+        tvg_id: c.tvg_id || '',
+        tvg_name: c.tvg_name || c.name || `Canal ${idx + 1}`,
+        language: c.language || 'pt',
+        country: c.country || 'BR',
+        active: true,
+        order_index: c.order_index || idx + 1
+      })),
+      movies: movieChannels.map((c, idx) => ({
+        id: c.id || 100000 + idx + 1,
+        name: c.name || `Filme ${idx + 1}`,
+        description: `Canal de filmes: ${c.name || ''}`,
+        stream_url: c.stream_url || '',
+        logo: c.logo || '',
+        group_title: c.group_title || 'Filmes',
+        language: c.language || 'pt',
+        country: c.country || 'BR',
+        active: true,
+        order_index: c.order_index || idx + 1
+      })),
+      series: seriesChannels.map((c, idx) => ({
+        id: c.id || 200000 + idx + 1,
+        series_title: c.name || `Série ${idx + 1}`,
+        description: `Série: ${c.name || ''}`,
+        logo: c.logo || '',
+        group_title: c.group_title || 'Séries',
+        language: c.language || 'pt',
+        country: c.country || 'BR',
+        active: true,
+        episodes: [{
+          season: 1,
+          episode: 1,
+          name: 'Episódio 1',
+          stream_url: c.stream_url || '',
+          order_index: 1
+        }]
+      }))
+    };
+
+    if (seriesData && seriesData.series) {
+      const xtremeSeries = seriesData.series || [];
+      xtremeSeries.forEach((s, idx) => {
+        feed.series.push({
+          id: s.series_id || 300000 + idx + 1,
+          series_title: s.name || `Série ${idx + 1}`,
+          description: s.overview || '',
+          logo: s.cover || s.poster || '',
+          group_title: s.category_name || 'Séries',
+          language: 'pt',
+          country: 'BR',
+          active: true,
+          episodes: (s.episodes || []).map((ep, epIdx) => ({
+            season: ep.season || 1,
+            episode: ep.episode_num || epIdx + 1,
+            name: ep.title || `Episódio ${epIdx + 1}`,
+            stream_url: ep.url || '',
+            order_index: epIdx + 1
+          }))
+        });
+      });
+    }
+
+    // Remove duplicatas
+    const uniqueLive = [];
+    const liveNames = new Set();
+    feed.live.forEach(c => {
+      if (!liveNames.has(c.name)) {
+        liveNames.add(c.name);
+        uniqueLive.push(c);
+      }
+    });
+    feed.live = uniqueLive;
+
+    return {
+      feed: feed,
+      total: channels.length,
+      live: feed.live.length,
+      movies: feed.movies.length,
+      series: feed.series.length
+    };
+  }
+
+  /* ============================================================
+     SALVAR NO SUPABASE - COM HEADERS CORRETOS
+     ============================================================ */
+  async function saveToSupabase(mac, pin, feedData, title) {
+    addDebug(`📤 Salvando no Supabase: MAC=${mac}, PIN=${pin}`);
+    
+    // Primeiro verifica se já existe
+    const searchUrl = `${SUPABASE_BASE_URL}/rest/v1/ListaIPTVoficial?code=eq.${encodeURIComponent(mac)}&select=id`;
+    addDebug(`🔍 Verificando: ${searchUrl}`);
+    
+    const searchRes = await fetch(searchUrl, {
+      method: 'GET',
+      headers: {
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY,
+        "Content-Type": "application/json"
+      }
+    });
+    
+    if (!searchRes.ok) {
+      const errText = await searchRes.text();
+      addDebug(`❌ Erro na busca: ${searchRes.status} - ${errText}`);
+      throw new Error(`Erro ao verificar registro: ${searchRes.status}`);
+    }
+    
+    const existing = await searchRes.json();
+    addDebug(`📦 Registros existentes: ${existing.length}`);
+
+    if (existing && existing.length > 0) {
+      // Atualiza
+      const updateUrl = `${SUPABASE_BASE_URL}/rest/v1/ListaIPTVoficial?id=eq.${existing[0].id}`;
+      addDebug(`🔄 Atualizando ID: ${existing[0].id}`);
+      
+      const updateRes = await fetch(updateUrl, {
+        method: "PATCH",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ 
+          feed: feedData, 
+          active: true 
+        })
+      });
+      
+      if (!updateRes.ok) {
+        const errText = await updateRes.text();
+        addDebug(`❌ Erro no PATCH: ${updateRes.status} - ${errText}`);
+        throw new Error(`Erro ao atualizar: ${updateRes.status}`);
+      }
+      
+      addDebug(`✅ Registro atualizado com sucesso!`);
+      return { action: 'updated' };
+      
+    } else {
+      // Insere
+      addDebug(`📝 Criando novo registro...`);
+      
+      const insertRes = await fetch(`${SUPABASE_BASE_URL}/rest/v1/ListaIPTVoficial`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY,
+          "Content-Type": "application/json",
+          "Prefer": "return=minimal"
+        },
+        body: JSON.stringify({ 
+          code: mac, 
+          pin: pin, 
+          active: true, 
+          feed: feedData 
+        })
+      });
+      
+      if (!insertRes.ok) {
+        const errText = await insertRes.text();
+        addDebug(`❌ Erro no POST: ${insertRes.status} - ${errText}`);
+        throw new Error(`Erro ao inserir: ${insertRes.status}`);
+      }
+      
+      addDebug(`✅ Novo registro criado com sucesso!`);
+      return { action: 'created' };
+    }
+  }
+
+  /* ============================================================
+     PROCESSO DE UPLOAD
+     ============================================================ */
+  async function processUpload(type) {
+    let mac, pin, title, button;
+    debugLogs = [];
+    document.getElementById('debugInfo').classList.add('show');
+    
+    if (type === 'm3u') {
+      mac = document.getElementById("m3uMac").value.trim().toUpperCase();
+      pin = document.getElementById("m3uPin").value.trim();
+      title = document.getElementById("m3uTitle").value.trim() || "Minha Lista";
+      const url = document.getElementById("m3uUrl").value.trim();
+      button = document.getElementById("btnM3u");
+
+      if (!url) { showStatus("❌ Informe a URL da lista M3U.", "error"); return; }
+      if (!/^[A-Z0-9]{7}$/.test(mac)) { showStatus("❌ MAC deve ter 7 dígitos.", "error"); return; }
+      if (!/^[0-9]{7}$/.test(pin)) { showStatus("❌ PIN deve ter 7 números.", "error"); return; }
+
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner"></span> BAIXANDO...';
+      showStatus("📥 Baixando lista M3U...", "");
+      document.getElementById('progressBar').style.display = 'block';
+
+      try {
+        const m3uContent = await downloadM3U(url);
+        document.getElementById('progressFill').style.width = '50%';
+        showStatus("🔄 Convertendo lista...", "");
+        
+        const result = parseM3UToJSON(m3uContent, title, mac, pin);
+        document.getElementById('progressFill').style.width = '75%';
+        
+        showStatus(`📤 Enviando ${result.total} canais para o Supabase...`, "");
+        await saveToSupabase(mac, pin, result.feed, title);
+        
+        document.getElementById('progressFill').style.width = '100%';
+        showStatus(`✅ Lista enviada! ${result.live} ao vivo | ${result.movies} filmes | ${result.series} séries`, "success");
+        addDebug(`🎉 FINALIZADO: ${result.live} ao vivo, ${result.movies} filmes, ${result.series} séries`);
+        
+      } catch (err) {
+        addDebug(`❌ ERRO FATAL: ${err.message}`);
+        showStatus(`❌ Erro: ${err.message}`, "error");
+      } finally {
+        button.disabled = false;
+        button.innerHTML = "📥 BAIXAR E ENVIAR LISTA";
+        setTimeout(() => { document.getElementById('progressBar').style.display = 'none'; document.getElementById('progressFill').style.width = '0%'; }, 3000);
+      }
+    } else {
+      // XTREME
+      mac = document.getElementById("xtremeMac").value.trim().toUpperCase();
+      pin = document.getElementById("xtremePin").value.trim();
+      title = document.getElementById("xtremeTitle").value.trim() || "Minha Lista Xtreme";
+      const user = document.getElementById("xtremeUser").value.trim();
+      const pass = document.getElementById("xtremePass").value.trim();
+      const host = document.getElementById("xtremeHost").value.trim();
+      button = document.getElementById("btnXtreme");
+
+      if (!host || !user || !pass) { showStatus("❌ Preencha Host, User e Pass.", "error"); return; }
+      if (!/^[A-Z0-9]{7}$/.test(mac)) { showStatus("❌ MAC deve ter 7 dígitos.", "error"); return; }
+      if (!/^[0-9]{7}$/.test(pin)) { showStatus("❌ PIN deve ter 7 números.", "error"); return; }
+
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner"></span> BAIXANDO...';
+      showStatus("📥 Baixando lista Xtreme...", "");
+      document.getElementById('progressBar').style.display = 'block';
+
+      try {
+        const data = await downloadXtreme(host, user, pass);
+        document.getElementById('progressFill').style.width = '50%';
+        showStatus("🔄 Convertendo lista...", "");
+        
+        const result = parseM3UToJSON(data.m3u, title, mac, pin, data.series);
+        document.getElementById('progressFill').style.width = '75%';
+        
+        showStatus(`📤 Enviando ${result.total} canais para o Supabase...`, "");
+        await saveToSupabase(mac, pin, result.feed, title);
+        
+        document.getElementById('progressFill').style.width = '100%';
+        showStatus(`✅ Lista enviada! ${result.live} ao vivo | ${result.movies} filmes | ${result.series} séries`, "success");
+        addDebug(`🎉 FINALIZADO: ${result.live} ao vivo, ${result.movies} filmes, ${result.series} séries`);
+        
+      } catch (err) {
+        addDebug(`❌ ERRO FATAL: ${err.message}`);
+        showStatus(`❌ Erro: ${err.message}`, "error");
+      } finally {
+        button.disabled = false;
+        button.innerHTML = "📥 BAIXAR E ENVIAR LISTA";
+        setTimeout(() => { document.getElementById('progressBar').style.display = 'none'; document.getElementById('progressFill').style.width = '0%'; }, 3000);
+      }
+    }
+  }
+
+  /* ============================================================
+     LOGIN E GERENCIAMENTO
+     ============================================================ */
+  async function loginAndFetch() {
     const mac = document.getElementById("loginMac").value.trim().toUpperCase();
     const pin = document.getElementById("loginPin").value.trim();
     const btn = document.getElementById("btnLogin");
 
     if (!/^[A-Z0-9]{7}$/.test(mac) || !/^[0-9]{7}$/.test(pin)) {
-        showStatus("MAC e PIN devem conter 7 caracteres.", "error");
-        return;
+      showStatus("MAC e PIN devem conter 7 caracteres.", "error");
+      return;
     }
 
     btn.disabled = true;
-    btn.innerHTML = "VERIFICANDO...";
+    btn.innerHTML = '<span class="spinner"></span> BUSCANDO...';
     showStatus("", "none");
 
     try {
-        const ghToken = await getGithubToken();
-        const fileData = await getGithubFile(mac, ghToken);
+      const searchUrl = `${SUPABASE_BASE_URL}/rest/v1/ListaIPTVoficial?code=eq.${encodeURIComponent(mac)}&pin=eq.${encodeURIComponent(pin)}&select=*`;
+      const res = await fetch(searchUrl, {
+        headers: { "apikey": SUPABASE_KEY, "Authorization": "Bearer " + SUPABASE_KEY, "Content-Type": "application/json" }
+      });
+      
+      if (!res.ok) throw new Error("Erro ao buscar");
+      const data = await res.json();
+      
+      if (!data || data.length === 0) throw new Error("Nenhuma lista encontrada para este MAC/PIN.");
 
-        if (!fileData) throw new Error("O código MAC informado não foi encontrado. Verifique os dados e tente novamente.");
-        if (fileData.json.Pin !== pin && fileData.json.pin !== pin) throw new Error("PIN incorreto.");
-
-        currentFileData = { mac, sha: fileData.sha, json: fileData.json, ghToken };
-        renderVerticalList();
-
-        document.getElementById("loginForm").style.display = "none";
-        document.getElementById("userListsContainer").style.display = "block";
-
+      currentFileData = { 
+        mac: mac, 
+        json: data[0].feed || { live: [], movies: [], series: [] },
+        id: data[0].id,
+        pin: pin
+      };
+      
+      renderVerticalList();
+      document.getElementById("loginForm").style.display = "none";
+      document.getElementById("userListsContainer").style.display = "block";
     } catch (err) {
-        showStatus("Erro: " + err.message, "error");
+      showStatus("Erro: " + err.message, "error");
     } finally {
-        btn.disabled = false;
-        btn.innerHTML = "ENTRAR E GERENCIAR";
+      btn.disabled = false;
+      btn.innerHTML = "ENTRAR E GERENCIAR";
     }
-}
+  }
 
-function renderVerticalList() {
+  function renderVerticalList() {
     const listDiv = document.getElementById("verticalList");
     listDiv.innerHTML = "";
+    
+    const feed = currentFileData.json;
+    let totalItems = 0;
+    
+    if (feed.live && feed.live.length > 0) totalItems += feed.live.length;
+    if (feed.movies && feed.movies.length > 0) totalItems += feed.movies.length;
+    if (feed.series && feed.series.length > 0) totalItems += feed.series.length;
 
-    let count = 0;
-    for (let i = 1; i <= 5; i++) {
-        const key = `List${i}`;
-        const item = currentFileData.json[key];
-
-        if (item && item !== "") {
-            count++;
-            const itemDiv = document.createElement("div");
-            itemDiv.className = "list-item";
-
-            let title = getValueByFlexibleKeys(item, ["titulo", "título"]) || `Lista ${i}`;
-            let m3uUrl = getValueByFlexibleKeys(item, ["m3u"]);
-            let user = getValueByFlexibleKeys(item, ["user"]);
-            let host = getValueByFlexibleKeys(item, ["host"]);
-
-            let details = "";
-            if (m3uUrl) {
-                details = `Tipo: M3U | URL: ${m3uUrl}`;
-            } else {
-                details = `Tipo: Xtreme | User: ${user} | Host: ${host}`;
-            }
-
-            itemDiv.innerHTML = `
-                <div class="list-item-info">
-                    <h4>${title}</h4>
-                    <p>${details}</p>
-                </div>
-                <div class="list-actions">
-                    <button class="btn-action btn-edit" onclick="openEditModal('${key}')">Editar</button>
-                    <button class="btn-action btn-delete" onclick="deleteList('${key}')">Apagar</button>
-                </div>
-            `;
-            listDiv.appendChild(itemDiv);
-        }
+    if (totalItems === 0) {
+      listDiv.innerHTML = `<p style="color:var(--muted); text-align:center; font-size:13px;">Nenhum canal encontrado.</p>`;
+      return;
     }
 
-    if (count === 0) {
-        listDiv.innerHTML = "<p style='color:#888; text-align:center;'>Nenhuma lista cadastrada.</p>";
-    }
-}
+    const summary = document.createElement("div");
+    summary.style.cssText = "background:var(--bg-soft);padding:12px;border-radius:10px;margin-bottom:12px;font-size:13px;color:var(--muted);";
+    summary.innerHTML = `
+      📺 <strong style="color:var(--text);">${feed.live?.length || 0}</strong> ao vivo | 
+      🎬 <strong style="color:var(--text);">${feed.movies?.length || 0}</strong> filmes | 
+      📺 <strong style="color:var(--text);">${feed.series?.length || 0}</strong> séries
+    `;
+    listDiv.appendChild(summary);
 
-async function deleteList(key) {
-    if (!confirm("Deseja realmente apagar esta lista?")) return;
+    const preview = document.createElement("div");
+    preview.style.cssText = "display:flex;flex-direction:column;gap:6px;";
+    
+    const allItems = [];
+    if (feed.live) feed.live.forEach(c => allItems.push({ ...c, type: '🔴 Ao vivo' }));
+    if (feed.movies) feed.movies.forEach(c => allItems.push({ ...c, type: '🎬 Filme' }));
+    if (feed.series) feed.series.forEach(c => allItems.push({ ...c, type: '📺 Série' }));
 
-    currentFileData.json[key] = "";
-    try {
-        await updateGithubFile(currentFileData.mac, currentFileData.json, currentFileData.sha, currentFileData.ghToken);
-        showStatus("Lista apagada com sucesso!", "success");
-        renderVerticalList();
-    } catch (e) {
-        showStatus("Erro ao apagar: " + e.message, "error");
-    }
-}
-
-// Preenchimento dos campos ao clicar em EDITAR
-function openEditModal(key) {
-    currentEditingKey = key;
-    const item = currentFileData.json[key];
-
-    const title = getValueByFlexibleKeys(item, ["titulo", "título"]);
-    const m3uUrl = getValueByFlexibleKeys(item, ["m3u"]);
-    const user = getValueByFlexibleKeys(item, ["user"]);
-    const pass = getValueByFlexibleKeys(item, ["pass"]);
-    const host = getValueByFlexibleKeys(item, ["host"]);
-
-    document.getElementById("editTitle").value = title;
-
-    if (m3uUrl !== "") {
-        document.getElementById("editTypeM3u").style.display = "block";
-        document.getElementById("editTypeXtreme").style.display = "none";
-        document.getElementById("editM3uUrl").value = m3uUrl;
-    } else {
-        document.getElementById("editTypeM3u").style.display = "none";
-        document.getElementById("editTypeXtreme").style.display = "block";
-        document.getElementById("editUser").value = user;
-        document.getElementById("editPass").value = pass;
-        document.getElementById("editHost").value = host;
-    }
-
-    document.getElementById("editModal").style.display = "flex";
-}
-
-function closeEditModal() {
-    document.getElementById("editModal").style.display = "none";
-}
-
-async function saveEditedList() {
-    const item = currentFileData.json[currentEditingKey];
-    const newTitle = document.getElementById("editTitle").value.trim();
-    const isM3u = getValueByFlexibleKeys(item, ["m3u"]) !== "";
-
-    if (isM3u) {
-        currentFileData.json[currentEditingKey] = {
-            "título": newTitle,
-            "ᴍ3ᴜ": document.getElementById("editM3uUrl").value.trim()
-        };
-    } else {
-        currentFileData.json[currentEditingKey] = {
-            "título": newTitle,
-            "ᴜꜱᴇʀ": document.getElementById("editUser").value.trim(),
-            "ᴩᴀꜱꜱ": document.getElementById("editPass").value.trim(),
-            "host": document.getElementById("editHost").value.trim()
-        };
-    }
-
-    try {
-        await updateGithubFile(currentFileData.mac, currentFileData.json, currentFileData.sha, currentFileData.ghToken);
-        closeEditModal();
-        showStatus("Lista atualizada com sucesso!", "success");
-        renderVerticalList();
-    } catch (e) {
-        showStatus("Erro ao atualizar: " + e.message, "error");
-    }
-}
-
-async function updateGithubFile(mac, jsonObject, sha, ghToken) {
-    const jsonString = JSON.stringify(jsonObject, null, 2);
-    const contentBase64 = btoa(unescape(encodeURIComponent(jsonString)));
-
-    const uploadUrl = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_PATH}/${mac}.json`;
-    const bodyPayload = {
-        message: `Atualizando lista do MAC ${mac}`,
-        content: contentBase64
-    };
-    if (sha) bodyPayload.sha = sha;
-
-    const res = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: {
-            "Authorization": `Bearer ${ghToken}`,
-            "Accept": "application/vnd.github.v3+json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(bodyPayload)
+    const showItems = allItems.slice(0, 10);
+    showItems.forEach(item => {
+      const div = document.createElement("div");
+      div.style.cssText = "display:flex;justify-content:space-between;padding:8px 12px;background:var(--panel);border-radius:8px;font-size:12px;";
+      div.innerHTML = `
+        <span style="color:var(--text);">${item.name || item.series_title || 'Sem nome'}</span>
+        <span style="color:var(--muted);">${item.type}</span>
+      `;
+      preview.appendChild(div);
     });
 
-    if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Erro no GitHub");
+    if (allItems.length > 10) {
+      const more = document.createElement("div");
+      more.style.cssText = "text-align:center;color:var(--muted);font-size:12px;padding:6px;";
+      more.textContent = `... e mais ${allItems.length - 10} itens`;
+      preview.appendChild(more);
     }
 
-    const resData = await res.json();
-    if (currentFileData) currentFileData.sha = resData.content.sha;
-}
+    listDiv.appendChild(preview);
+  }
 
-function logout() {
+  function logout() {
     currentFileData = null;
     document.getElementById("loginForm").style.display = "block";
     document.getElementById("userListsContainer").style.display = "none";
     showStatus("", "none");
-}
+  }
 
-function showStatus(message, type) {
+  function showStatus(message, type) {
     const box = document.getElementById("statusMessage");
-    if (!message || type === "none") {
-        box.style.display = "none";
-        return;
-    }
+    if (!message || type === "none") { box.style.display = "none"; return; }
     box.innerHTML = message;
     box.className = type === "success" ? "status-success" : "status-error";
     box.style.display = "block";
-}
+  }
+
+  /* ============================================================
+     DISPOSITIVOS
+     ============================================================ */
+  const DEVICES = [
+    { id: 'roku',      name: 'Roku',       abbr: 'RK', released: true,  url: '#' },
+    { id: 'android',   name: 'Android',    abbr: 'AN', released: true,  url: '#' },
+    { id: 'androidtv', name: 'Android TV', abbr: 'TV', released: false, url: '#' },
+    { id: 'firetv',    name: 'Fire TV',    abbr: 'FT', released: false, url: '#' },
+    { id: 'samsung',   name: 'Samsung',    abbr: 'SM', released: false, url: '#' },
+    { id: 'lg',        name: 'LG',         abbr: 'LG', released: false, url: '#' },
+    { id: 'windows',   name: 'Windows',    abbr: 'WN', released: false, url: '#' },
+  ];
+
+  const grid = document.getElementById('deviceGrid');
+  DEVICES.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'device-card ' + (d.released ? 'is-live' : 'is-soon');
+    card.innerHTML = `
+      <div class="device-icon">${d.abbr}</div>
+      <div class="device-name">${d.name}</div>
+      <div class="device-status"><span class="dot"></span>${d.released ? 'Disponível' : 'Em breve'}</div>
+    `;
+    card.addEventListener('click', () => {
+      if (d.released) { window.open(d.url, '_blank'); } 
+      else { showToast(`${d.name} ainda está em análise.`); }
+    });
+    grid.appendChild(card);
+  });
+
+  let toastTimer;
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
 </script>
 
 </body>
